@@ -5,15 +5,15 @@ const Header = ({ course }) => (
   <h1>{course}</h1>
 )
 
-const Course = ({course}) => (
-    <div>
-        <Header course={course.name} />
-        <Content parts={course.parts} />
-        <Total course={course} />
-    </div>
+const Course = ({ course }) => (
+  <div>
+    <Header course={course.name} />
+    <Content parts={course.parts} />
+    <Total course={course} />
+  </div>
 )
 
-const Total = ({course}) => {
+const Total = ({ course }) => {
   console.log(course.parts.map(part => (part.exercises)))
   const total = course.parts
     .map(part => (part.exercises))
@@ -33,7 +33,8 @@ const Content = ({ parts }) => (
 )
 
 const App = () => {
-    const course = {
+  const courses = [
+    {
       name: 'Half Stack application development',
       parts: [
         {
@@ -52,24 +53,35 @@ const App = () => {
           id: 3
         },
         {
-          name: 'New Part',
-          exercises: 1,
+          name: 'Redux',
+          exercises: 11,
           id: 4
+        }
+      ]
+    },
+    {
+      name: 'Node.js',
+      parts: [
+        {
+          name: 'Routing',
+          exercises: 3,
+          id: 1
         },
         {
-          name: 'New Part 2',
-          exercises: 13,
-          id: 5
+          name: 'Middlewares',
+          exercises: 7,
+          id: 2
         }
       ]
     }
-  
-    return (
-      <div>
-        <Course course={course} />
-      </div>
-    )
-  }
+  ]
+
+  return (
+    <div>
+      {courses.map(course => (<Course course={course} />))}
+    </div>
+  )
+}
 
 ReactDOM.render(
   <App />,
