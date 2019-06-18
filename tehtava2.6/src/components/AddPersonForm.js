@@ -13,8 +13,8 @@ const AddPersonForm = (props) => (
         <div>
             phonenumber:
           <input
-                value={props.newPhoneNumber}
-                onChange={props.handlePhoneNumberChange}
+                value={props.newNumber}
+                onChange={props.handleNumberChange}
             />
         </div>
         <div>
