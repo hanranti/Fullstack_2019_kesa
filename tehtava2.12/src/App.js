@@ -25,7 +25,8 @@ function App() {
     <Filter countrySearch={countrySearch} handleCountrySearchChange={handleCountrySearchChange} />
     <Countries countries={countries.filter(country =>
       country.name.toUpperCase().includes(
-        countrySearch.toUpperCase()))} />
+        countrySearch.toUpperCase()))}
+      setCountrySearch={setCountrySearch} />
   </div>)
 }
 

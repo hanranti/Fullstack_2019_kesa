@@ -1,5 +1,8 @@
 import React from 'react'
 
+const chooseCountryButton = (setCountrySearch, name) => (
+    <button onClick={() => setCountrySearch(name)}>show</button>)
+
 const CountryDetails = ({ country }) => (<div>
     <h1>{country.name}</h1>
     <p>capital {country.capital}</p>
@@ -9,7 +12,7 @@ const CountryDetails = ({ country }) => (<div>
     <img src={country.flag} alt="Flag" height="50" />
 </div>)
 
-const showCountries = (countries) => {
+const showCountries = (countries, setCountrySearch) => {
     switch (true) {
         case (countries.length == 0):
             return (<p>No matches</p>)
@@ -18,15 +21,14 @@ const showCountries = (countries) => {
         case (countries.length > 10):
             return (<p>Too many matches, specify another filter</p>)
         default:
-            return countries.map(country => (<li key={country.name}>{country.name}</li>))
+            return (<ul>{countries.map(country =>
+                (<li key={country.name}>{country.name}{chooseCountryButton(setCountrySearch, country.name)}</li>))}</ul>)
     }
 }
 
 const Countries = (props) => (
     <div>
-        <ul>
-            {showCountries(props.countries)}
-        </ul>
+        {showCountries(props.countries, props.setCountrySearch)}
     </div>
 )
 
