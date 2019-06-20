@@ -1,33 +1,35 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 
 import Numbers from './components/Numbers'
 import Filter from './components/Filter';
 import AddPersonForm from './components/AddPersonForm';
 
+import personsService from './services/persons'
+
 const App = () => {
 
   const [persons, setPersons] = useState([])
+
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then(response => {
-      setPersons(persons.concat(response.data))
-    })
+    personsService.getAll().then(response => {
+      setPersons(persons.concat(response))
+    }).catch(error => alert("Something went wrong!"))
   }, [])
+
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
 
   const addPerson = (event) => {
-    const addOrAlert = (persons.some(person => person.name === newName)
-      ? () => alert(`${newName} is already added to phonebook`)
-      : () => {
-        setPersons(persons.concat({ name: newName, number: newNumber, id: persons.length + 1 }))
+    (persons.some(person => person.name === newName)
+      ? alert(`${newName} is already added to phonebook`)
+      : personsService.addPerson({ name: newName, number: newNumber }).then(response => {
+        setPersons(persons.concat(response))
         setNewName('')
         setNewNumber('')
-      }
+      }).catch(error => alert("Something went wrong"))
     )
 
-    addOrAlert()
     event.preventDefault()
   }
 
