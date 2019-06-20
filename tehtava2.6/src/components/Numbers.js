@@ -1,7 +1,9 @@
 import React from 'react'
 
-const Number = ({ person }) => (
-    <li>{person.name} {person.number}</li>
+const DeletePersonButton = ({ deletePerson, person }) => (<button onClick={() => deletePerson({ deletedPerson: person })}>delete</button>)
+
+const Number = ({ deletePerson, person }) => (
+    <li>{person.name} {person.number} <DeletePersonButton deletePerson={deletePerson} person={person} /></li>
 )
 
 const Numbers = (props) => (
@@ -10,7 +12,7 @@ const Numbers = (props) => (
         <div>
             <ul>
                 {props.persons.filter(person => person.name.toUpperCase().includes(props.filterName.toUpperCase())
-                ).map(person => (<Number key={person.id} person={person} />))}
+                ).map(person => (<Number deletePerson={props.deletePerson} key={person.id} person={person} />))}
             </ul>
         </div>
     </div>

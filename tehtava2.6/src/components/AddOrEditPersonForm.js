@@ -1,7 +1,7 @@
 import React from 'react'
 
-const AddPersonForm = (props) => (
-    <form onSubmit={props.addPerson}>
+const AddOrEditPersonForm = (props) => (
+    <form onSubmit={props.addOrEditPerson}>
         <h2>add a new</h2>
         <div>
             name:
@@ -23,4 +23,4 @@ const AddPersonForm = (props) => (
     </form>
 )
 
-export default AddPersonForm
+export default AddOrEditPersonForm
