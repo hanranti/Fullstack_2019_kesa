@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import axios from 'axios'
 import './App.css';
 import Filter from './components/Filter'
 import Countries from './components/Countries';
+import Weather from './components/Weather';
 
 const countriesURL = "https://restcountries.eu/rest/v2/all"
 const weatherURL = "https://api.openweathermap.org/data/2.5/weather?q="
@@ -12,7 +13,7 @@ function App() {
   const [countrySearch, setCountrySearch] = useState('')
   const [allCountries, setAllCountries] = useState([])
   const [filteredCountries, setFilteredCountries] = useState([])
-  const [weather, setWeather] = useState({})
+  const [weather, setWeather] = useState("")
 
   useEffect(() => {
     axios.get(countriesURL)
@@ -21,33 +22,23 @@ function App() {
       })
   }, [])
 
+  useLayoutEffect(() => {
+    filteredCountries.length === 1
+      ? getWeather(filteredCountries[0].capital, filteredCountries[0].alpha2Code)
+      : setWeather("")
+  }, [countrySearch])
+
   const handleFilterChange = (event) => {
-    handleCountrySearchChange(event.target.value)
-      .then(handleCountriesChange)
-      .then(handleWeatherChange)
-      .catch(console.log("Something went wrong!"))
-  }
-
-  const handleCountrySearchChange = async (filterValue) => {
-    setCountrySearch(filterValue)
-  }
-
-  const handleCountriesChange = async (event) => {
-    setFilteredCountries(allCountries.filter(country =>
-      country.name.toUpperCase().includes(
-        countrySearch.toUpperCase())))
-  }
-
-  const handleWeatherChange = async (event) => {
-    typeof filteredCountries !== 'undefined' && filteredCountries.length === 1 ? getWeather(filteredCountries[0].capital, filteredCountries[0].alpha2Code) : console.log("")
+    setCountrySearch(event.target.value)
+    const newFilteredCountries = allCountries.filter(
+      country => country.name.toUpperCase().includes(event.target.value.toUpperCase())
+    )
+    setFilteredCountries(newFilteredCountries)
   }
 
   const getWeather = (city, country) => {
-    axios.get(weatherURL + city + "," + country + "&units=metric&APPID=" + weatherAPPID).then(response => setWeather(response.data)).catch(console.log("weather request failed"))
-    console.log(filteredCountries)
-    console.log(city)
-    console.log(country)
-    console.log(weather)
+    axios.get(weatherURL + city + "," + country + "&units=metric&APPID=" + weatherAPPID)
+      .then(response => setWeather(response.data))
   }
 
   return (
@@ -60,8 +51,9 @@ function App() {
       <Countries
         countries={filteredCountries}
         setCountrySearch={setCountrySearch}
-        weather={weather}
+        getWeather={getWeather}
       />
+      <Weather weather={weather} />
     </div>
   )
 }
