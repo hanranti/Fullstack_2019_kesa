@@ -15,23 +15,20 @@ const CountryDetails = ({ country }) => (
     </div>
 )
 
-const createCountryDetails = async (country, getWeather) => {
-    const weather = await getWeather(country.capital, country.alpha2Code)
-
-    return <CountryDetails country={country} weather={weather} />
-}
-
 const showCountries = (countries, setCountrySearch, getWeather) => {
     switch (true) {
         case (countries.length === 0):
-            return (<p>No matches</p>)
+            return <p>No matches</p>
         case (countries.length === 1):
             return <CountryDetails country={countries[0]} />
         case (countries.length > 10):
-            return (<p>Too many matches, specify another filter</p>)
+            return <p>Too many matches, specify another filter</p>
         default:
-            return (<ul>{countries.map(country =>
-                (<li key={country.name}>{country.name}{chooseCountryButton(setCountrySearch, country.name)}</li>))}</ul>)
+            return (
+                <ul>{countries.map(country =>
+                    <li key={country.name}>{country.name}{chooseCountryButton(setCountrySearch, country.name)}</li>)}
+                </ul>
+            )
     }
 }
 

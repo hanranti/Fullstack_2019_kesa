@@ -10,18 +10,20 @@ import personService from './services/persons'
 const App = () => {
 
   const [persons, setPersons] = useState([])
-
-  useEffect(() => {
-    personService.getAll().then(response => {
-      setPersons(persons.concat(response))
-    }).catch(error => alert("Something went wrong!"))
-  }, [])
-
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
   const [notificationMessage, setNotificationMessage] = useState('')
   const [notificationClass, setNotificationClass] = useState('')
+  const success = 'success'
+  const neutral = 'neutral'
+  const error = 'error'
+
+  useEffect(() => {
+    personService.getAll().then(response => {
+      setPersons(persons.concat(response))
+    }).catch(error => timedNotification("Something went wrong!", error))
+  }, [])
 
   const addOrEditPerson = (event) => {
     event.preventDefault()
@@ -29,57 +31,42 @@ const App = () => {
 
     switch (editedPerson) {
       case undefined:
-        personService.addPerson({ name: newName, number: newNumber }).then(response => {
-          setPersons(persons.concat(response))
-          setNewName('')
-          setNewNumber('')
-          timedNotification(`Added ${newName}!`, 'success')
-        }).catch(error => alert("Something went wrong!"))
+        addPerson(newName, newNumber)
         break
       default:
-        window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)
-          ? personService.editPerson({ name: newName, number: newNumber }, editedPerson.id).then(response =>
-            setPersons(persons.map(person => person.id !== editedPerson.id ? person : response)))
-            .then(response => timedNotification(`Edited number of ${newName}`, 'success'))
-            .catch(error => {
-              personService.getAll().then(response => {
-                setPersons(response)
-              }).catch(error => alert("Something went wrong!"))
-              timedNotification(`Person named ${newName} was removed from server recently!`, 'error')
-            })
-          : timedNotification(`Cancelled editing ${newName}!`, 'neutral')
+        editPerson(newName, newNumber, editedPerson)
         break
     }
-
-    //    persons.some(person => person.name === newName
-    //      ? window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)
-    //        ? personService.editPerson({ name: newName, number: newNumber }, persons.filter(p => p.name === newName)[0].id)
-    //        : console.log("Person editing cancelled!")
-    //      : personService.addPerson({ name: newName, number: newNumber }).then(response => {
-    //        setPersons(persons.concat(response))
-    //        setNewName('')
-    //        setNewNumber('')
-    //      }).catch(error => alert("Something went wrong!"))
-    //    )
-
   }
 
-  const timedNotification = (message, className) => {
-    setNotificationMessage(message)
-    setNotificationClass(className)
-    setTimeout(() => {
-      setNotificationMessage('')
-      setNotificationClass('')
-    }, 10000)
-  }
+  const addPerson = (name, number) =>
+    personService.addPerson({ name: name, number: number }).then(response => {
+      setPersons(persons.concat(response))
+      setNewName('')
+      setNewNumber('')
+      timedNotification(`Added ${name}!`, success)
+    }).catch(error => timedNotification("Something went wrong!", error))
+
+  const editPerson = (name, number, editedPerson) =>
+    window.confirm(`${name} is already added to the phonebook, replace the old number with a new one?`)
+      ? personService.editPerson({ name: name, number: number }, editedPerson.id).then(response =>
+        setPersons(persons.map(person => person.id !== editedPerson.id ? person : response)))
+        .then(response => timedNotification(`Edited number of ${name}`, success))
+        .catch(error => {
+          personService.getAll().then(response => {
+            setPersons(response)
+          }).catch(error => timedNotification("Something went wrong!", error))
+          timedNotification(`Person named ${name} was removed from server recently!`, error)
+        })
+      : timedNotification(`Cancelled editing ${name}!`, neutral)
 
   const deletePerson = ({ deletedPerson }) => {
     window.confirm(`Delete ${deletedPerson.name}`)
       ? personService.deletePerson(deletedPerson.id).then(response =>
         setPersons(persons.filter(person => person.id !== deletedPerson.id)))
-        .then(timedNotification(`Deleted ${deletedPerson.name}!`, 'success')).catch(error =>
-          timedNotification("That person was already deleted!", 'error'))
-      : timedNotification(`Cancelled deleting ${deletePerson.name}!`, 'neutral')
+        .then(timedNotification(`Deleted ${deletedPerson.name}!`, success)).catch(error =>
+          timedNotification("That person was already deleted!", error))
+      : timedNotification(`Cancelled deleting ${deletedPerson.name}!`, neutral)
   }
 
   const handleNameChange = (event) => {
@@ -94,9 +81,20 @@ const App = () => {
     setFilterName(event.target.value)
   }
 
+  const timedNotification = (message, className) => {
+    setNotificationMessage(message)
+    setNotificationClass(className)
+    setTimeout(() => {
+      setNotificationMessage('')
+      setNotificationClass('')
+    }, 10000)
+  }
+
   return (
     <div>
-      {notificationMessage !== '' ? <Notification notificationMessage={notificationMessage} className={notificationClass} /> : <div></div>}
+      {notificationMessage !== ''
+        ? <Notification notificationMessage={notificationMessage} className={notificationClass} />
+        : <div></div>}
       <h2>Phonebook</h2>
       <Filter filterName={filterName} handleFilterNameChange={handleFilterNameChange} />
       <AddOrEditPersonForm
