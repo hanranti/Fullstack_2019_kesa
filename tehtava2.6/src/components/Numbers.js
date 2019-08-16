@@ -9,7 +9,6 @@ const Number = ({ deletePerson, person }) => (
 )
 
 const Numbers = (props) => {
-    console.log(props)
     return (
         <div>
             <h2>Numbers</h2>

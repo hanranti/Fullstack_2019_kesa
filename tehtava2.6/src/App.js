@@ -21,8 +21,12 @@ const App = () => {
 
   useEffect(() => {
     personService.getAll().then(response => {
+      console.log(response)
       setPersons(persons.concat(response))
-    }).catch(error => timedNotification("Something went wrong!", error))
+    }).catch(err => {
+      timedNotification("Something went wrong!", error)
+      console.log(err)
+    })
   }, [])
 
   const addOrEditPerson = (event) => {
@@ -45,7 +49,7 @@ const App = () => {
       setNewName('')
       setNewNumber('')
       timedNotification(`Added ${name}!`, success)
-    }).catch(error => timedNotification("Something went wrong!", error))
+    }).catch(err => timedNotification("Something went wrong!", error))
 
   const editPerson = (name, number, editedPerson) =>
     window.confirm(`${name} is already added to the phonebook, replace the old number with a new one?`)
@@ -55,7 +59,7 @@ const App = () => {
         .catch(error => {
           personService.getAll().then(response => {
             setPersons(response)
-          }).catch(error => timedNotification("Something went wrong!", error))
+          }).catch(err => timedNotification("Something went wrong!", error))
           timedNotification(`Person named ${name} was removed from server recently!`, error)
         })
       : timedNotification(`Cancelled editing ${name}!`, neutral)
@@ -64,7 +68,7 @@ const App = () => {
     window.confirm(`Delete ${deletedPerson.name}`)
       ? personService.deletePerson(deletedPerson.id).then(response =>
         setPersons(persons.filter(person => person.id !== deletedPerson.id)))
-        .then(timedNotification(`Deleted ${deletedPerson.name}!`, success)).catch(error =>
+        .then(timedNotification(`Deleted ${deletedPerson.name}!`, success)).catch(err =>
           timedNotification("That person was already deleted!", error))
       : timedNotification(`Cancelled deleting ${deletedPerson.name}!`, neutral)
   }
